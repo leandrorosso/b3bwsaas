@@ -11,3 +11,583 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// Criar uma migration: yarn prisma migrate dev
+model User {
+  id String @id @default(uuid())
+  name String?
+  firstname String @db.VarChar(200)
+  lastname String @db.VarChar(200)
+  email String @db.VarChar(200)
+  emailVerified DateTime?
+  image String? 
+  address String? @default("")
+  phone String? @default("")
+  status Boolean @default(true)
+  timeZone String?   
+  stripe_customer_id String?  
+  password String @db.VarChar(200)
+  inactive Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  @@map("users")
+
+  userdepartments Userdepartment[]
+  usercompanyroles Usercompanyrole[]
+  userscales Userscale[]
+  userroles Userrole[]
+  forms Form[]
+  formusers Formuser[]
+  formsteps Formstep[] 
+  processstepextends Processstepextend[] 
+
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]  
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
+
+model Role{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  inactive Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("roles")
+
+  userroles Userrole[]
+  formroles Formrole[] 
+}
+
+model Department{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  inactive Boolean @default(false)
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("departments")
+
+  userdepartments Userdepartment[]
+  formdepartments Formdepartment[]
+}
+
+model Companyrole{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  inactive Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("companyroles")
+
+  usercompanyroles Usercompanyrole[]
+  forms Form[]
+}
+
+model Userdepartment{
+  id String @id @default(uuid())
+  responsible Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  user User @relation(fields: [user_id], references: [id])
+  department Department @relation(fields: [department_id], references: [id])
+
+  @@map("userdepartments")
+
+  user_id String
+  department_id String
+}
+
+model Usercompanyrole{
+  id String @id @default(uuid())
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  user User @relation(fields: [user_id], references: [id])
+  companyrole Companyrole @relation(fields: [companyrole_id], references: [id])
+
+  @@map("usercompanyroles")
+
+  user_id String
+  companyrole_id String
+}
+
+model Userrole{
+  id String @id @default(uuid())
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  user User @relation(fields: [user_id], references: [id])
+  role Role @relation(fields: [role_id], references: [id])
+
+  @@map("userroles")
+
+  user_id String
+  role_id String
+}
+
+model State{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  uf String @db.VarChar(2)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("states")
+
+  citys City[]
+  holidays Holiday[]  
+}
+
+model City{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  codeibge String @db.VarChar(10)
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  state State @relation(fields: [state_id], references: [id])
+
+  @@map("citys")
+
+  state_id String
+
+  personaddresss Personaddress[]
+}
+
+model Typeperson{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  inactive Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("typepersons")
+
+  persons Person[]
+}
+
+model Person{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  cpfcnpj String @db.VarChar(20)
+  stateregistration String @db.VarChar(200)
+  municipalregistration String @db.VarChar(200)
+  inactive Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  typeperson Typeperson @relation(fields: [typeperson_id], references: [id])
+
+  @@map("persons")
+
+  personcontacts Personcontact[]
+  personaddresss Personaddress[]  
+
+  typeperson_id String
+}
+
+model Personcontact{
+  id String @id @default(uuid())
+  type String @db.VarChar(20)
+  contact String @db.VarChar(200)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  person Person @relation(fields: [person_id], references: [id])
+
+  @@map("personcontacts")
+
+  person_id String
+}
+
+model Personaddress{
+  id String @id @default(uuid())
+  type String @db.VarChar(20)
+  address String @db.VarChar(200)
+  number String @db.VarChar(20)
+  neighborhood String @db.VarChar(200)
+  cep String @db.VarChar(20)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  person Person @relation(fields: [person_id], references: [id])
+  city City @relation(fields: [city_id], references: [id])
+
+  @@map("personaddresss")
+
+  person_id String
+  city_id String
+}
+
+model Holiday{
+  id String @id @default(uuid())
+  description String @db.VarChar(200)
+  date DateTime
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  state State @relation(fields: [state_id], references: [id])
+
+  @@map("holidays")
+
+  state_id String
+}
+
+model Scale{
+  id String @id @default(uuid())
+  name String @db.VarChar(200)
+  inactive Boolean @default(false) 
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  @@map("scales")
+
+  scaledays Scaleday[]
+  userscales Userscale[]
+}
+
+model Scaleday{
+  id String @id @default(uuid())
+  date DateTime
+  starttime String @db.VarChar(6)
+  endtime String @db.VarChar(6)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  scale Scale @relation(fields: [scale_id], references: [id])
+
+  @@map("scaledays")
+
+  scale_id String
+}
+
+model Userscale{
+  id String @id @default(uuid())
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  isdeleted Boolean @default(false)
+  user User @relation(fields: [user_id], references: [id])
+  scale Scale @relation(fields: [scale_id], references: [id])
+
+  @@map("userscales")
+
+  user_id String
+  scale_id String
+}
+
+model Form{
+  id String @id @default(uuid())
+  description String @db.VarChar(200)
+  title String @db.VarChar(200)
+  descriptive_flow  String
+  descriptive_help String
+  inactive Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  user User @relation(fields: [user_id], references: [id])
+  companyrole Companyrole @relation(fields: [companyrole_id], references: [id])
+
+  @@map("forms")
+
+  user_id String
+  companyrole_id String
+
+  formusers Formuser[]
+  formroles Formrole[]
+  formdepartments Formdepartment[]
+  formsteps Formstep[]
+  processs Process[]
+}
+
+model Formuser{
+  id String @id @default(uuid())
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  form Form @relation(fields: [form_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("formusers")
+
+  form_id String
+  user_id String
+}
+
+model Formrole{
+  id String @id @default(uuid())
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+  form Form @relation(fields: [form_id], references: [id])
+  role Role @relation(fields: [role_id], references: [id])
+
+  @@map("formroles")
+
+  form_id String
+  role_id String
+}
+
+model Formdepartment{
+  id String @id @default(uuid())
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  form Form @relation(fields: [form_id], references: [id])
+  department Department @relation(fields: [department_id], references: [id])
+
+  @@map("formdepartments")
+
+  form_id String
+  department_id String
+}
+
+model Formstep{
+  id String @id @default(uuid())
+  description String @db.VarChar(200)
+  term String @db.VarChar(20)
+  inform_date Boolean @default(false)
+  type_period String @db.VarChar(2)
+  term_supervisor String @db.VarChar(20)
+  type_period_supervisor String @db.VarChar(2)
+  term_manager String @db.VarChar(20)
+  type_period_manager String @db.VarChar(2)
+  type_user String @db.VarChar(2)
+  inactive Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  form Form @relation(fields: [form_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("formsteps")
+
+  form_id String
+  user_id String
+
+  formstepfields Formstepfield[]
+  formstepemails Formstepemail[] 
+  formstepextends Formstepextend[] 
+  processstpes Processstep[]
+}
+
+model Formstepfield{
+  id String @id @default(uuid())
+  description String @db.VarChar(200)
+  type String @db.VarChar(20)
+  size String @db.VarChar(20)
+  options  String
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  formstep Formstep @relation(fields: [formstep_id], references: [id])
+
+  @@map("formstepfields")
+
+  formstep_id String
+
+  processstepfields Processstepfield[]
+}
+
+model Formstepemail{
+  id String @id @default(uuid())
+  type String @db.VarChar(50)
+  type_registration String @db.VarChar(50)
+  code_registration String @db.VarChar(50)
+  email String @db.VarChar(200)
+  message String 
+  day_notice String @db.VarChar(4)
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  formstep Formstep @relation(fields: [formstep_id], references: [id])
+
+  @@map("formstepemails")
+
+  formstep_id String
+}
+
+model Formstepextend{
+  id String @id @default(uuid())
+  sequence String @db.VarChar(4)
+  term String @db.VarChar(4)
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  formstep Formstep @relation(fields: [formstep_id], references: [id])
+
+  @@map("formstepextends")
+
+  formstep_id String
+
+  processstepextends Processstepextend[]
+}
+
+model Process{
+  id String @id @default(uuid())
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  form Form @relation(fields: [form_id], references: [id])
+
+  @@map("processs")
+
+  form_id String
+
+  processsteps Processstep[]
+}
+
+model Processstep{
+  id String @id @default(uuid())
+  date_finished DateTime?
+  status String @db.VarChar(4)
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  process Process @relation(fields: [process_id], references: [id])
+  formstep Formstep @relation(fields: [formstep_id], references: [id])
+
+  @@map("processsteps")
+
+  process_id String
+  formstep_id String
+
+  processstepuploads Processstepupload[]
+  processstepextends Processstepextend[]  
+  processstepfields Processstepfield[]  
+}
+
+model Processstepupload{
+  id String @id @default(uuid())
+  description String @db.VarChar(200)
+  file_name String @db.VarChar(200)
+  isdeleted Boolean @default(false)  
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  processstep Processstep @relation(fields: [processstep_id], references: [id])
+
+  @@map("processstepuploads")
+
+  processstep_id String
+}
+
+model Processstepextend{
+  id String @id @default(uuid())
+  date_extend DateTime?
+  justify String @db.VarChar(200)
+  date_authorization DateTime?
+  authorization Boolean @default(false)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  processstep Processstep @relation(fields: [processstep_id], references: [id])
+  formstepextend Formstepextend @relation(fields: [formstepextend_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("processstepextends")
+
+  processstep_id String
+  formstepextend_id String
+  user_id String
+}
+
+model Processstepfield{
+  id String @id @default(uuid())
+  value String @db.VarChar(200)
+  isdeleted Boolean @default(false)
+  created_at DateTime? @default(now())
+  updated_at DateTime? @updatedAt
+
+  processstep Processstep @relation(fields: [processstep_id], references: [id])
+  formstepfield  Formstepfield @relation(fields: [formstepfield_id], references: [id])
+
+  @@map("processstepfields")
+
+  processstep_id String
+  formstepfield_id String
+}
