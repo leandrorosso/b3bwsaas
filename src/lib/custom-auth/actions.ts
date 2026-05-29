@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 
 import { user } from "./data";
 import type { User } from "./types";
+import prisma from "../prisma";
 
 function generateToken(): string {
 	const arr = new Uint8Array(12);
@@ -33,6 +34,34 @@ export interface ResetPasswordParams {
 
 export async function signUp(_: SignUpParams): Promise<{ data?: { user: User }; error?: string }> {
 	// Store the user in the database
+
+	/*
+	const userAlreadyExists =  await prisma.user.findFirst({
+		where:{
+			email: data.email
+		}
+	})
+
+	if(userAlreadyExists){
+		throw new Error("Usuário já existe !!!")
+	}
+
+    // Criptografar a senha
+    const passwordHash = await hash(password, 8)
+
+	const user = await prismaClient.user.create({
+	data:{
+		name: data.name,
+		email: data.email,
+		password: passwordHash,
+	},
+	select:{
+		id: true,
+		name: true,
+		email: true,
+	}
+	})*/
+
 	const token = generateToken();
 	const cookieStore = await cookies();
 	cookieStore.set("access_token", token);
@@ -48,6 +77,23 @@ export async function signInWithPassword(
 	params: SignInWithPasswordParams
 ): Promise<{ data?: { user: User }; error?: string }> {
 	const { email, password } = params;
+
+	/*const user = await prisma.user.findFirst({
+		where:{
+			email: email
+		}
+	})
+
+	if(!user){
+		throw new Error("Usuário/Senha incorreto !!!")
+	}
+
+	const passwordMatch = await compare(password, user.password)
+
+	if(!passwordMatch){
+		throw new Error("Usuário/Senha incorreto !!!")
+	}
+		*/
 
 	// We hardcode the credentials for the simplicity of the example
 	if (email !== "sofia@devias.io" || password !== "Secret1") {
