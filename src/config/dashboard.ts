@@ -40,6 +40,16 @@ export const dashboardConfig = {
 					matcher: { type: "startsWith", href: "/dashboard/settings" },
 				},
 				{
+					key: "typepersons",
+					title: "Type Persons",
+					icon: "typeperson",
+					items: [
+						{ key: "typepersons", title: "List type persons", href: paths.dashboard.typepersons.list },
+						{ key: "typepersons:create", title: "Create type person", href: paths.dashboard.typepersons.create },
+						{ key: "typepersons:details", title: "Type person details", href: paths.dashboard.typepersons.details("1") },
+					],
+				},				
+				{
 					key: "customers",
 					title: "Customers",
 					icon: "users",

@@ -22,13 +22,13 @@ export function SplitLayout({ children }: SplitLayoutProps): React.JSX.Element {
 			>
 				<Stack spacing={4} sx={{ maxWidth: "700px" }}>
 					<Stack spacing={1}>
-						<Typography variant="h4">Bem-vindo ao Sistema B3BW Sistemas</Typography>
+						<Typography variant="h4">Welcome to B3BW Sistemas</Typography>
 						<Typography color="text.secondary">
-							A B3BW Sistemas oferece soluções inteligentes para a gestão de processos e workflow, auxiliando empresas a automatizar atividades, padronizar fluxos de trabalho e aumentar a eficiência operacional.<br />
+							B3BW Sistemas offers intelligent solutions for process and workflow management, helping companies automate activities, standardize workflows, and increase operational efficiency.<br />
 
-							Nossa plataforma foi desenvolvida para simplificar o controle de processos, promover a colaboração entre equipes e fornecer maior visibilidade sobre as operações, permitindo decisões mais rápidas e assertivas.<br /> <br />
+							Our platform was developed to simplify process control, promote collaboration between teams, and provide greater visibility into operations, enabling faster and more confident decisions.<br /> <br />
 
-							<b>Transforme seus processos em resultados com tecnologia, agilidade e inovação.</b>
+							<b>Transform your processes into results with technology, agility, and innovation.</b>
 						</Typography>
 					</Stack>
 				</Stack>

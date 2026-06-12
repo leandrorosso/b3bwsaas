@@ -28,6 +28,7 @@ import { Translate as TranslateIcon } from "@phosphor-icons/react/dist/ssr/Trans
 import { Truck as TruckIcon } from "@phosphor-icons/react/dist/ssr/Truck";
 import { Upload as UploadIcon } from "@phosphor-icons/react/dist/ssr/Upload";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
+import { UserList as TypepersonIcon } from "@phosphor-icons/react/dist/ssr/UserList";
 import { WarningDiamond as WarningDiamondIcon } from "@phosphor-icons/react/dist/ssr/WarningDiamond";
 
 export const icons = {
@@ -61,4 +62,5 @@ export const icons = {
 	truck: TruckIcon,
 	upload: UploadIcon,
 	users: UsersIcon,
+	typeperson: TypepersonIcon,
 } as Record<string, Icon>;

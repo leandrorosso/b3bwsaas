@@ -117,6 +117,11 @@ export const paths = {
 			profile: { timeline: "/dashboard/social/profile", connections: "/dashboard/social/profile/connections" },
 			feed: "/dashboard/social/feed",
 		},
+		typepersons: {
+			list: "/dashboard/typepersons",
+			create: "/dashboard/typepersons/create",
+			details: (typePersonId: string) => `/dashboard/typepersons/${typePersonId}`,
+		},
 		tasks: "/dashboard/tasks",
 	},
 	pdf: { invoice: (invoiceId: string) => `/pdf/invoices/${invoiceId}` },
